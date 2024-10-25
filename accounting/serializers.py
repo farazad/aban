@@ -63,7 +63,6 @@ class TransactionSerializer(serializers.Serializer):
 
         with db_transaction.atomic():
             if transaction_type == 'buy':
-                wallet = wallet.block_funds(total_cost)
                 transaction_event = TransactionEvent.objects.create(
                     wallet=wallet,
                     initial_balance=wallet.balance,
@@ -73,6 +72,7 @@ class TransactionSerializer(serializers.Serializer):
                     transaction_type='withdrawal',
                     description=f"Purchase of {quantity} {asset.symbol}"
                 )
+                wallet = wallet.block_funds(total_cost)
                 if total_cost > Decimal('10.0'):
                     result = buy_from_exchange(asset.symbol, total_cost)
                     transaction_event.finalize_transaction(result)

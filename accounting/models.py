@@ -47,7 +47,7 @@ class Wallet(models.Model):
             wallet.modified_at = timezone.now()
             if commit:
                 wallet.save()
-            return wallet.balance
+            return wallet
 
     def block_funds(self, amount):
         """Block funds for pending transactions."""
@@ -58,7 +58,7 @@ class Wallet(models.Model):
             wallet.blocked += amount
             wallet.balance -= amount
             wallet.save()
-        return self
+        return wallet
 
     def unblock_funds(self, amount):
         """Unblock funds if a transaction is canceled or completed."""
@@ -70,7 +70,7 @@ class Wallet(models.Model):
             wallet.balance += amount
             wallet.save()
 
-        return self
+        return wallet
 
 
 class TransactionEvent(models.Model):
@@ -118,12 +118,11 @@ class TransactionEvent(models.Model):
         with db_transaction.atomic():
             if success:
                 # Deduct blocked funds and update wallet quantity
-                wallet.update_balance(-self.amount)
-                wallet.quantity += self.amount / wallet.asset.buy_price  # Assuming buy price at time of transaction
+                wallet = wallet.update_balance(-self.amount)
                 self.status = 'completed'
             else:
                 # Unblock funds if transaction failed
-                wallet.unblock_funds(self.amount)
+                wallet = wallet.unblock_funds(self.amount)
                 self.status = 'canceled'
             
             self.end_balance = wallet.balance
