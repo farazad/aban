@@ -58,7 +58,7 @@ class Wallet(models.Model):
             wallet.blocked += amount
             wallet.balance -= amount
             wallet.save()
-            return self
+        return self
 
     def unblock_funds(self, amount):
         """Unblock funds if a transaction is canceled or completed."""
@@ -70,7 +70,7 @@ class Wallet(models.Model):
             wallet.balance += amount
             wallet.save()
 
-            return self
+        return self
 
 
 class TransactionEvent(models.Model):
@@ -86,31 +86,31 @@ class TransactionEvent(models.Model):
     def __str__(self):
         return f"{self.transaction_type} of {self.amount} ({self.status}) on {self.timestamp}"
 
-    def save(self, *args, **kwargs):
-        """Override save method to block/unblock/apply funds based on transaction status."""
-        with db_transaction.atomic():
-            wallet = Wallet.objects.select_for_update().get(pk=self.wallet.pk)
+    # def save(self, *args, **kwargs):
+    #     """Override save method to block/unblock/apply funds based on transaction status."""
+    #     with db_transaction.atomic():
+    #         wallet = Wallet.objects.select_for_update().get(pk=self.wallet.pk)
             
-            if self.pk is None and self.status == 'pending':
-                self.initial_balance = wallet.balance
-                if self.transaction_type == 'withdrawal':
-                    wallet.block_funds(self.amount)
-                    self.change = -self.amount
-                elif self.transaction_type == 'deposit':
-                    wallet.update_balance(self.amount, commit=False)
-                    self.change = self.amount
+    #         if self.pk is None and self.status == 'pending':
+    #             self.initial_balance = wallet.balance
+    #             if self.transaction_type == 'withdrawal':
+    #                 wallet.block_funds(self.amount)
+    #                 self.change = -self.amount
+    #             elif self.transaction_type == 'deposit':
+    #                 wallet.update_balance(self.amount, commit=False)
+    #                 self.change = self.amount
 
-            if self.status == 'completed':
-                if self.transaction_type == 'withdrawal':
-                    wallet.update_balance(-self.amount)
-                self.end_balance = wallet.balance
+    #         if self.status == 'completed':
+    #             if self.transaction_type == 'withdrawal':
+    #                 wallet.update_balance(-self.amount)
+    #             self.end_balance = wallet.balance
 
-            if self.status == 'canceled':
-                if self.transaction_type == 'withdrawal':
-                    wallet.unblock_funds(self.amount)
-                self.end_balance = wallet.balance
+    #         if self.status == 'canceled':
+    #             if self.transaction_type == 'withdrawal':
+    #                 wallet.unblock_funds(self.amount)
+    #             self.end_balance = wallet.balance
 
-            super().save(*args, **kwargs)
+    #         super().save(*args, **kwargs)
     
     def finalize_transaction(self, success: bool):
         """Finalize the transaction based on the exchange result."""
@@ -127,8 +127,8 @@ class TransactionEvent(models.Model):
                 self.status = 'canceled'
             
             self.end_balance = wallet.balance
-            self.save()
-            wallet.save()
+        self.save()
+        wallet.save()
 
     @classmethod
     def get_pending_volume(cls, asset):
