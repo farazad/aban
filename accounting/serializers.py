@@ -8,7 +8,7 @@ from .services import buy_from_exchange
 class WalletSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wallet
-        fields = '__all__'
+        fields = ['asset', 'balance', 'blocked']
 
 
 class TransactionSerializer(serializers.Serializer):
@@ -30,7 +30,7 @@ class TransactionSerializer(serializers.Serializer):
         # Ensure asset exists and wallet is available
         try:
             asset = Asset.objects.get(id=asset_id)
-            wallet = Wallet.objects.select_for_update().get(user=user, asset=asset)
+            wallet, _ = Wallet.objects.select_for_update().get_or_create(user=user)
         except Asset.DoesNotExist:
             raise serializers.ValidationError("Asset not found.")
         except Wallet.DoesNotExist:
@@ -63,17 +63,17 @@ class TransactionSerializer(serializers.Serializer):
 
         with db_transaction.atomic():
             if transaction_type == 'buy':
+                wallet = wallet.block_funds(total_cost)
                 transaction_event = TransactionEvent.objects.create(
                     wallet=wallet,
                     initial_balance=wallet.balance,
                     amount=total_cost,
-                    transaction_type='withdrawal',
+                    end_balance = wallet.balance - total_cost,
                     status='pending',
+                    transaction_type='withdrawal',
                     description=f"Purchase of {quantity} {asset.symbol}"
                 )
-                wallet.block_funds(total_cost)
-                wallet.save()
-                if total_cost < Decimal('10.0'):
+                if total_cost > Decimal('10.0'):
                     result = buy_from_exchange(asset.symbol, total_cost)
                     transaction_event.finalize_transaction(result)
 

@@ -30,15 +30,11 @@ class Asset(models.Model):
 
 class Wallet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, null= False)
     quantity = models.IntegerField(default=0)
     balance = models.DecimalField(max_digits=20, decimal_places=10, default=Decimal('0.0'), null=False)
     blocked = models.DecimalField(max_digits=40, decimal_places=20, default=Decimal('0.0'),null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ('user', 'asset')
 
     def __str__(self):
         return f"{self.user}'s Wallet"
@@ -62,16 +58,19 @@ class Wallet(models.Model):
             wallet.blocked += amount
             wallet.balance -= amount
             wallet.save()
+            return self
 
     def unblock_funds(self, amount):
         """Unblock funds if a transaction is canceled or completed."""
         with db_transaction.atomic():
             wallet = Wallet.objects.select_for_update().get(pk=self.pk)
-            if amount > wallet.blocked_balance:
+            if amount > wallet.blocked:
                 raise ValueError("Insufficient blocked funds")
-            wallet.blocked_balance -= amount
+            wallet.blocked -= amount
             wallet.balance += amount
             wallet.save()
+
+            return self
 
 
 class TransactionEvent(models.Model):
