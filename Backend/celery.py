@@ -1,7 +1,7 @@
 from celery import Celery
 from celery.schedules import crontab
 
-app = Celery('your_project_name')
+app = Celery('Backend')
 
 app.conf.beat_schedule = {
     'process_pending_transactions': {
