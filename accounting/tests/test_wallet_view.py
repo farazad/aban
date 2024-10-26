@@ -11,7 +11,7 @@ def api_client():
 
 @pytest.fixture
 def user(db):
-    return User.objects.create_user(username='testuser', password='testpass')
+    return User.objects.create_user(phone_number='09121111111', name='testuser', password='testpass')
 
 @pytest.fixture
 def asset(db):
@@ -19,7 +19,7 @@ def asset(db):
 
 @pytest.fixture
 def wallet(user, asset, db):
-    return Wallet.objects.create(user=user, asset=asset, quantity=10, balance=100)
+    return Wallet.objects.create(user=user, quantity=10, balance=100)
 
 @pytest.mark.django_db
 def test_authenticated_user_can_access_wallet(api_client, user, wallet):
