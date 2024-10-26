@@ -5,3 +5,6 @@ djangorestframework==3.15.2
 
 #celery
 celery==5.4.0
+
+#test
+pytest==8.3.3
