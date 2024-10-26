@@ -2,13 +2,30 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile
     ports:
       - "8000:8000"
     volumes:
       - .:/app
     command: python manage.py runserver 0.0.0.0:8000
 
-  worker:
-    build: .
-    command: celery -A Backend worker -l INFO
+  celery-default:
+    container_name: celery-default
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    command: celery -A backend worker -l info -c 2 -Q default
+
+  celery-beat:
+    container_name: celery-beat
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    command: celery -A backend beat -l info
+    depends_on:
+      - celery-default
+      - celery-order
