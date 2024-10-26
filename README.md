@@ -3,7 +3,7 @@ To run the project locally, follow these steps:
 
 1. Clone the repository to your local machine:
 ```bash
-git clone https://github.com/fatemeh-mgsdi/crypto-buyer-api.git
+git clone https://github.com/farazad/aban.git
 cd crypto-buyer-api/
 ```
 2. Install the project's dependencies:
