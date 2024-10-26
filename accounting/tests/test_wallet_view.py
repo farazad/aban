@@ -2,7 +2,8 @@ import pytest
 from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
-from user_app.models import Wallet, User, Asset  # Adjust for your app structure
+from user.models import User
+from accounting.models import Wallet, Asset
 
 @pytest.fixture
 def api_client():
