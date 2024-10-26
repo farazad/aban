@@ -18,7 +18,7 @@ def asset(db):
     return Asset.objects.create(name='TestAsset', symbol='TA', buy_price=10, sell_price=9)
 
 @pytest.fixture
-def wallet(user, asset, db):
+def wallet(user, db):
     return Wallet.objects.create(user=user, quantity=10, balance=100)
 
 @pytest.mark.django_db
@@ -27,7 +27,7 @@ def test_authenticated_user_can_access_wallet(api_client, user, wallet):
     api_client.force_authenticate(user=user)
     
     # Retrieve wallet data
-    url = reverse('wallet-view')  # Assuming 'wallet-view' is the name in urls.py
+    url = reverse('wallet')  # Assuming 'wallet-view' is the name in urls.py
     response = api_client.get(url)
     
     # Check response status and data
@@ -38,7 +38,7 @@ def test_authenticated_user_can_access_wallet(api_client, user, wallet):
 
 @pytest.mark.django_db
 def test_unauthenticated_user_cannot_access_wallet(api_client):
-    url = reverse('wallet-view')
+    url = reverse('wallet')
     response = api_client.get(url)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -48,7 +48,7 @@ def test_authenticated_user_without_wallet(api_client, user):
     # Authenticate the user without a wallet
     api_client.force_authenticate(user=user)
     
-    url = reverse('wallet-view')
+    url = reverse('wallet')
     response = api_client.get(url)
     
     # Adjust error handling as per your logic; assuming it raises a 404
