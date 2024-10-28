@@ -1,7 +1,12 @@
+import os
 from celery import Celery
 from celery.schedules import crontab
 
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Backend.settings')
+
 app = Celery('Backend')
+app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
     'process_pending_transactions': {
