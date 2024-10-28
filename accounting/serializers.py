@@ -30,7 +30,7 @@ class TransactionSerializer(serializers.Serializer):
         # Ensure asset exists and wallet is available
         try:
             asset = Asset.objects.get(id=asset_id)
-            wallet, _ = Wallet.objects.select_for_update().get_or_create(user=user)
+            wallet= Wallet.objects.select_for_update().get(user=user)
         except Asset.DoesNotExist:
             raise serializers.ValidationError("Asset not found.")
         except Wallet.DoesNotExist:
