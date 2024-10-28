@@ -132,6 +132,6 @@ class TransactionEvent(models.Model):
     @classmethod
     def get_pending_volume(cls, asset):
         """Calculate the total volume of pending buy transactions for a given asset."""
-        return cls.objects.filter(transaction_type='buy', status='pending', wallet__asset=asset).aggregate(
+        return cls.objects.filter(transaction_type='buy', status='pending').aggregate(
             total_volume=models.Sum('amount')
         )['total_volume'] or Decimal('0.0')
