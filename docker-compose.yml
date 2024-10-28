@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: python manage.py runserver 0.0.0.0:8000
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend
+
+  celery-default:
+    container_name: celery-default
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    command: celery -A Backend worker -l info -c 2 -Q default
+    depends_on:
+      - rabbitmq
+    networks:
+      - backend
+    environment:
+      - DJANGO_SETTINGS_MODULE=Backend.settings
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+    volumes:
+    - .:/app
+    working_dir: /app
+
+
+  celery-beat:
+    container_name: celery-beat
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    command: celery -A Backend beat -l info
+    depends_on:
+      - celery-default
+      - rabbitmq
+    networks:
+      - backend
+    environment:
+      - DJANGO_SETTINGS_MODULE=Backend.settings
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+    volumes:
+    - .:/app
+    working_dir: /app
+
+
+networks:
+  backend:
+    driver: bridge

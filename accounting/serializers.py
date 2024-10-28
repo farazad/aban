@@ -8,7 +8,7 @@ from .services import buy_from_exchange
 class WalletSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wallet
-        fields = ['asset', 'balance', 'blocked']
+        fields = ['balance', 'blocked']
 
 
 class TransactionSerializer(serializers.Serializer):

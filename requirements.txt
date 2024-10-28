@@ -3,5 +3,12 @@ django==5.1.2
 django-cors-headers==3.13.0
 djangorestframework==3.15.2
 
+#jwt
+djangorestframework-simplejwt==5.3.1
+
 #celery
 celery==5.4.0
+
+#test
+pytest==8.3.3
+pytest-django==4.9.0
