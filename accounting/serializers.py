@@ -69,7 +69,7 @@ class TransactionSerializer(serializers.Serializer):
                     amount=total_cost,
                     end_balance = wallet.balance - total_cost,
                     status='pending',
-                    transaction_type='withdrawal',
+                    transaction_type='buy',
                     description=f"Purchase of {quantity} {asset.symbol}"
                 )
                 wallet = wallet.block_funds(total_cost)
@@ -85,7 +85,7 @@ class TransactionSerializer(serializers.Serializer):
                     initial_balance=wallet.balance,
                     amount=total_sale,
                     end_balance=wallet.balance,
-                    transaction_type='deposit',
+                    transaction_type='sell',
                     status='completed',
                     description=f"Sale of {quantity} {asset.symbol}"
                 )
