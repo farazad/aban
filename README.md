@@ -27,3 +27,17 @@ pip install -r requirements.txt
 python manage.py runserver
 ```
 Once the server is running, you can access the API at http://localhost:8000/.
+
+### Running with Docker
+To run the project using Docker, follow these steps:
+```bash
+docker-compose build
+docker-compose up -d
+```
+
+### Running Tests
+To run the tests, use pytest:
+```bash
+source venv/bin/activate
+pytest
+```
