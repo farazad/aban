@@ -54,3 +54,39 @@ def test_get_pending_volume(wallet):
     # Assertions
     total_pending = TransactionEvent.get_pending_volume(wallet)
     assert total_pending == Decimal("250.00") 
+
+@pytest.mark.django_db
+def test_wallet_update_balance(user):
+    wallet = Wallet.objects.create(user=user, balance=Decimal("1000.00"))
+    
+    # Update the balance
+    updated_wallet = wallet.update_balance(commit=True)
+    
+    # Assertions
+    updated_wallet.refresh_from_db()
+    assert updated_wallet.balance == Decimal("1000.00")
+    assert updated_wallet.blocked == Decimal("0.00")
+
+@pytest.mark.django_db
+def test_block_funds(user):
+    wallet = Wallet.objects.create(user=user, balance=Decimal("1000.00"))
+    
+    # Block funds
+    wallet.block_funds(Decimal("200.00"))
+    
+    # Assertions
+    wallet.refresh_from_db()
+    assert wallet.blocked == Decimal("200.00")
+    assert wallet.balance == Decimal("800.00")
+
+@pytest.mark.django_db
+def test_unblock_funds(user):
+    wallet = Wallet.objects.create(user=user, balance=Decimal("800.00"), blocked=Decimal("200.00"))
+    
+    # Unblock funds
+    wallet.unblock_funds(Decimal("200.00"))
+    
+    # Assertions
+    wallet.refresh_from_db()
+    assert wallet.blocked == Decimal("0.00")
+    assert wallet.balance == Decimal("1000.00")

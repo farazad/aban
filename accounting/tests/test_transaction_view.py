@@ -27,5 +27,5 @@ def test_create_transaction(api_client, user, asset):
     assert TransactionEvent.objects.count() == 1
     transaction = TransactionEvent.objects.first()
     assert transaction.amount == Decimal(5*10)
-    assert transaction.transaction_type == "withdrawal"
+    assert transaction.transaction_type == "buy"
     assert transaction.status in ["canceled", "completed"]
