@@ -39,11 +39,11 @@ class Wallet(models.Model):
     def __str__(self):
         return f"{self.user}'s Wallet"
 
-    def update_balance(self, amount, commit=True):
+    def update_balance(self, commit=True):
         """Updates the wallet's balance by a given amount. Uses select_for_update for concurrency."""
         with db_transaction.atomic():
             wallet = Wallet.objects.select_for_update().get(pk=self.pk)
-            wallet.balance += amount
+            wallet.blocked = 0
             wallet.modified_at = timezone.now()
             if commit:
                 wallet.save()
