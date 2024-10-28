@@ -1,4 +1,13 @@
-# Running Locally
+# Aban Project
+This project is based on Django-based REST Framework that allows users to view, buy, and manage their balances.
+
+## Getting Started
+### Prerequisites
+Before running the project, you'll need to have the following installed on your machine:
+. Python3
+. Docker (if running with Docker)
+
+### Running Locally
 To run the project locally, follow these steps:
 
 1. Clone the repository to your local machine:
