@@ -28,4 +28,3 @@ services:
     command: celery -A backend beat -l info
     depends_on:
       - celery-default
-      - celery-order
